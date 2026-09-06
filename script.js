@@ -129,6 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const next = document.querySelector(".review-next");
 
   let current = 0;
+  
 
   function showReview(index) {
 
@@ -167,5 +168,129 @@ document.addEventListener("DOMContentLoaded", function () {
   setInterval(function() {
     showReview(current + 1);
   }, 4000);
+
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const track = document.querySelector(".reviews-track");
+    const slides = document.querySelectorAll(".review-slide");
+    const prevBtn = document.querySelector(".review-prev");
+    const nextBtn = document.querySelector(".review-next");
+    const dotsContainer = document.querySelector(".review-dots");
+
+    if (!track || !slides.length || !prevBtn || !nextBtn) {
+        return;
+    }
+
+    let currentPage = 0;
+
+
+    function getSlidesPerView() {
+        return window.innerWidth <= 768 ? 1 : 2;
+    }
+
+
+    function getTotalPages() {
+        return Math.ceil(slides.length / getSlidesPerView());
+    }
+
+
+    function createDots() {
+
+        dotsContainer.innerHTML = "";
+
+        const totalPages = getTotalPages();
+
+        for (let i = 0; i < totalPages; i++) {
+
+            const dot = document.createElement("span");
+
+            dot.className = "review-dot";
+
+            if (i === currentPage) {
+                dot.classList.add("active");
+            }
+
+            dot.addEventListener("click", () => {
+                currentPage = i;
+                updateSlider();
+            });
+
+            dotsContainer.appendChild(dot);
+        }
+    }
+
+
+    function updateSlider() {
+
+        const perView = getSlidesPerView();
+
+        const viewport = document.querySelector(".reviews-viewport");
+
+        const slideWidth = viewport.offsetWidth / perView;
+
+        const moveDistance =
+            currentPage * slideWidth * perView;
+
+        track.style.transform =
+            `translateX(-${moveDistance}px)`;
+
+
+        const dots = document.querySelectorAll(".review-dot");
+
+        dots.forEach((dot, index) => {
+
+            dot.classList.remove("active");
+
+            if (index === currentPage) {
+                dot.classList.add("active");
+            }
+
+        });
+
+    }
+
+
+    nextBtn.addEventListener("click", () => {
+
+        currentPage++;
+
+        if (currentPage >= getTotalPages()) {
+            currentPage = 0;
+        }
+
+        updateSlider();
+
+    });
+
+
+    prevBtn.addEventListener("click", () => {
+
+        currentPage--;
+
+        if (currentPage < 0) {
+            currentPage = getTotalPages() - 1;
+        }
+
+        updateSlider();
+
+    });
+
+
+    window.addEventListener("resize", () => {
+
+        currentPage = 0;
+
+        createDots();
+
+        updateSlider();
+
+    });
+
+
+    createDots();
+
+    updateSlider();
 
 });
